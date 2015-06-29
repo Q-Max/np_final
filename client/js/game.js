@@ -54,16 +54,31 @@ PhaserGame.prototype = {
             this.pl[plnum].img.scale.x = 1;
             this.pl[plnum].img.scale.y = 1;
             if (this.cursor.right.isDown) {
-                this.pl[plnum].move(this.pl[plnum].x+1, this.py[this.pl[plnum].x+1]);
-                this.client.ws.send(JSON.stringify({pl: plnum, pos:this.pl[plnum].x}));
-                this.pl[plnum].hide = false;
+                if (this.cursor.right.shiftKey) {
+                    this.pl[plnum].move(this.pl[plnum].x+5, this.py[this.pl[plnum].x+5]);
+                    this.client.ws.send(JSON.stringify({pl: plnum, pos:this.pl[plnum].x}));
+                    this.pl[plnum].hide = false;
+
+                }
+                else {
+                    this.pl[plnum].move(this.pl[plnum].x+1, this.py[this.pl[plnum].x+1]);
+                    this.client.ws.send(JSON.stringify({pl: plnum, pos:this.pl[plnum].x}));
+                    this.pl[plnum].hide = false;
+                }
 
             }
             else if (this.cursor.left.isDown) {
-                this.pl[plnum].move(this.pl[plnum].x-1, this.py[this.pl[plnum].x-1]);
-                this.client.ws.send(JSON.stringify({pl: plnum, pos:this.pl[plnum].x}));
-                this.pl[plnum].hide = false;
+                if (this.cursor.left.shiftKey) {
+                    this.pl[plnum].move(this.pl[plnum].x-5, this.py[this.pl[plnum].x-5]);
+                    this.client.ws.send(JSON.stringify({pl: plnum, pos:this.pl[plnum].x}));
+                    this.pl[plnum].hide = false;
 
+                }
+                else {
+                    this.pl[plnum].move(this.pl[plnum].x-1, this.py[this.pl[plnum].x-1]);
+                    this.client.ws.send(JSON.stringify({pl: plnum, pos:this.pl[plnum].x}));
+                    this.pl[plnum].hide = false;
+                }
             }
         
 	    else if (this.cursor.up.isDown) {
