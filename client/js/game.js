@@ -27,68 +27,88 @@ PhaserGame.prototype = {
     },
 
     update: function() {
-        if (this.cursor.down.onUp||this.cursor.up.onUp) {
-            this.pl[plnum].img.scale.x = 1;
-            this.pl[plnum].img.scale.y = 1;
-            this.pl[plnum].hide = false;
-            this.client.ws.send(JSON.stringify({action: 'update', pl: plnum, pos: this.pl[plnum].x}));
-        }
-        if (this.cursor.down.isDown) {
-            this.pl[plnum].img.scale.x = 2;
-            this.pl[plnum].img.scale.y = 2;
-            this.pl[plnum].hide = false;
-            this.client.ws.send(JSON.stringify({action: 'attack', pl: plnum}));
-            for (var i in this.pl) {
-                if (i != plnum
-                    && this.pl[i].dead == false
-                    && this.pl[i].hide == false
-                    && this.pl[i].x > this.pl[plnum].x - 32
-                    && this.pl[i].x < this.pl[plnum].x + 32
-                    && this.pl[i].y > this.pl[plnum].y - 32
-                    && this.pl[i].y < this.pl[plnum].y + 32) {
-                    this.client.ws.send(JSON.stringify({action: 'kill', pl: i}));
+
+        if (this.pl[plnum].dead == false){
+            // if (this.cursor.down.onUp.active||this.cursor.up.onUp.active) {
+                
+                function sleep(milliseconds) {
+                    var start = new Date().getTime();
+                    for (var i = 0; i < 1e7; i++) {
+                        if ((new Date().getTime() - start) > milliseconds){
+                            break;
+                        }
+                    }
+                }
+                
+            // }
+            if (this.cursor.down.isDown) {
+                this.pl[plnum].img.scale.x = 2;
+                this.pl[plnum].img.scale.y = 2;
+                this.pl[plnum].hide = false;
+                this.client.ws.send(JSON.stringify({action: 'attack', pl: plnum}));
+                for (var i in this.pl) {
+                    if (i != plnum
+                        && this.pl[i].dead == false
+                        && this.pl[i].hide == false
+    //                    && this.pl[i].x > this.pl[plnum].x - 32
+    //                    && this.pl[i].x < this.pl[plnum].x + 32
+    //                    && this.pl[i].y > this.pl[plnum].y - 32
+    //                    && this.pl[i].y < this.pl[plnum].y + 32
+                        && Math.sqrt(Math.pow((this.pl[i].x-this.pl[plnum].x),2)
+                         + Math.pow((this.pl[i].y-this.pl[plnum].y),2))<32) {
+                        this.client.ws.send(JSON.stringify({action: 'kill', pl: i}));
+                    }
                 }
             }
-        }
-        else {
-            this.pl[plnum].img.scale.x = 1;
-            this.pl[plnum].img.scale.y = 1;
-            if (this.cursor.right.isDown) {
-                if (this.cursor.right.shiftKey) {
-                    this.pl[plnum].move(this.pl[plnum].x+5, this.py[this.pl[plnum].x+5]);
-                    this.client.ws.send(JSON.stringify({pl: plnum, pos:this.pl[plnum].x}));
-                    this.pl[plnum].hide = false;
+            
+            else {
+                this.pl[plnum].img.scale.x = 1;
+                this.pl[plnum].img.scale.y = 1;
+                if (this.cursor.right.isDown&&this.pl[plnum].x<800) {
+                    if (this.cursor.right.shiftKey) {
+                        this.pl[plnum].move(this.pl[plnum].x+5, this.py[this.pl[plnum].x+5]);
+                        this.client.ws.send(JSON.stringify({pl: plnum, pos:this.pl[plnum].x}));
+                        this.pl[plnum].hide = false;
 
+                    }
+                    else {
+                        this.pl[plnum].move(this.pl[plnum].x+1, this.py[this.pl[plnum].x+1]);
+                        this.client.ws.send(JSON.stringify({pl: plnum, pos:this.pl[plnum].x}));
+                        this.pl[plnum].hide = false;
+                    }
+
+                }
+                else if (this.cursor.left.isDown&&this.pl[plnum].x>0) {
+                    if (this.cursor.left.shiftKey) {
+                        this.pl[plnum].move(this.pl[plnum].x-5, this.py[this.pl[plnum].x-5]);
+                        this.client.ws.send(JSON.stringify({pl: plnum, pos:this.pl[plnum].x}));
+                        this.pl[plnum].hide = false;
+
+                    }
+                    else {
+                        this.pl[plnum].move(this.pl[plnum].x-1, this.py[this.pl[plnum].x-1]);
+                        this.client.ws.send(JSON.stringify({pl: plnum, pos:this.pl[plnum].x}));
+                        this.pl[plnum].hide = false;
+                    }
+                }
+            
+                else if (this.cursor.up.isDown) {
+                    this.pl[plnum].img.scale.x = 0.6;
+                    this.pl[plnum].img.scale.y = 0.6;
+                    this.client.ws.send(JSON.stringify({action: 'hide', pl: plnum}));
+                    this.pl[plnum].hide = true;
                 }
                 else {
-                    this.pl[plnum].move(this.pl[plnum].x+1, this.py[this.pl[plnum].x+1]);
-                    this.client.ws.send(JSON.stringify({pl: plnum, pos:this.pl[plnum].x}));
+                    this.pl[plnum].img.scale.x = 1;
+                    this.pl[plnum].img.scale.y = 1;
                     this.pl[plnum].hide = false;
+                    this.client.ws.send(JSON.stringify({action: 'update', pl: plnum, pos: this.pl[plnum].x}));
                 }
-
+     
             }
-            else if (this.cursor.left.isDown) {
-                if (this.cursor.left.shiftKey) {
-                    this.pl[plnum].move(this.pl[plnum].x-5, this.py[this.pl[plnum].x-5]);
-                    this.client.ws.send(JSON.stringify({pl: plnum, pos:this.pl[plnum].x}));
-                    this.pl[plnum].hide = false;
-
-                }
-                else {
-                    this.pl[plnum].move(this.pl[plnum].x-1, this.py[this.pl[plnum].x-1]);
-                    this.client.ws.send(JSON.stringify({pl: plnum, pos:this.pl[plnum].x}));
-                    this.pl[plnum].hide = false;
-                }
-            }
-        
-	    else if (this.cursor.up.isDown) {
-                this.pl[plnum].img.scale.x = 0.6;
-                this.pl[plnum].img.scale.y = 0.6;
-                this.client.ws.send(JSON.stringify({action: 'hide', pl: plnum}));
-                this.pl[plnum].hide = true;
-            }
- 
-	}
+            sleep(50);
+        }
+    
         //if (this.cursor.up.isDown) {
         //    this.pl[0].img.scale.x += 0.1;
         //    this.pl[0].img.scale.y += 0.1;
@@ -133,7 +153,7 @@ PhaserGame.prototype = {
             this.pl.push(new Player(0, 0));
         var x = this.rnd.between(0,768);
         this.pl[plnum].move(x, this.py[x]);
-        this.client.ws.send(JSON.stringify({pl: plnum, pos:this.pl[plnum].x}));
+        this.client.ws.send(JSON.stringify({action: 'update', pl: plnum, pos: this.pl[plnum].x}));
     },
 
     plot: function () {
@@ -218,6 +238,8 @@ Client.prototype.onMessage = function(message) {
     case 'adduser':
         var g = game.state.states.Game;
         g.pl.push(new Player(0, 0));
+        this.client.ws.send(JSON.stringify({action: 'update', pl: plnum, pos: this.pl[plnum].x}));
+ 
         break;
     case 'close':
         var g = game.state.states.Game;
