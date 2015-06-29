@@ -27,12 +27,21 @@ PhaserGame.prototype = {
     },
 
     update: function() {
+        if (this.cursor.down.onUp||this.cursor.up.onUp) {
+            this.pl[plnum].img.scale.x = 1;
+            this.pl[plnum].img.scale.y = 1;
+            this.pl[plnum].hide = false;
+            this.client.ws.send(JSON.stringify({action: 'update', pl: plnum, pos: this.pl[plnum].x}));
+        }
         if (this.cursor.down.isDown) {
             this.pl[plnum].img.scale.x = 2;
             this.pl[plnum].img.scale.y = 2;
+            this.pl[plnum].hide = false;
+            this.client.ws.send(JSON.stringify({action: 'attack', pl: plnum}));
             for (var i in this.pl) {
                 if (i != plnum
                     && this.pl[i].dead == false
+                    && this.pl[i].hide == false
                     && this.pl[i].x > this.pl[plnum].x - 32
                     && this.pl[i].x < this.pl[plnum].x + 32
                     && this.pl[i].y > this.pl[plnum].y - 32
@@ -47,12 +56,24 @@ PhaserGame.prototype = {
             if (this.cursor.right.isDown) {
                 this.pl[plnum].move(this.pl[plnum].x+1, this.py[this.pl[plnum].x+1]);
                 this.client.ws.send(JSON.stringify({pl: plnum, pos:this.pl[plnum].x}));
+                this.pl[plnum].hide = false;
+
             }
-            if (this.cursor.left.isDown) {
+            else if (this.cursor.left.isDown) {
                 this.pl[plnum].move(this.pl[plnum].x-1, this.py[this.pl[plnum].x-1]);
                 this.client.ws.send(JSON.stringify({pl: plnum, pos:this.pl[plnum].x}));
+                this.pl[plnum].hide = false;
+
             }
-        }
+        
+	    else if (this.cursor.up.isDown) {
+                this.pl[plnum].img.scale.x = 0.6;
+                this.pl[plnum].img.scale.y = 0.6;
+                this.client.ws.send(JSON.stringify({action: 'hide', pl: plnum}));
+                this.pl[plnum].hide = true;
+            }
+ 
+	}
         //if (this.cursor.up.isDown) {
         //    this.pl[0].img.scale.x += 0.1;
         //    this.pl[0].img.scale.y += 0.1;
@@ -131,6 +152,7 @@ var Player = function (x, y) {
     this.x = x;
     this.y = y;
     this.dead = false;
+    this.hide = false;
 };
 
 Player.prototype = {
@@ -151,7 +173,7 @@ function Client() {
 }
 
 Client.prototype.openConnection = function() {
-    this.ws = new WebSocket("ws://192.168.56.1:4000");
+    this.ws = new WebSocket("ws://192.168.20.11:4000");
     this.connected = false;
     this.ws.onmessage = this.onMessage.bind(this);
     this.ws.onerror = this.displayError.bind(this);
@@ -174,6 +196,9 @@ Client.prototype.onMessage = function(message) {
     case 'update':
         var g = game.state.states.Game;
         g.pl[msg.pl].move(msg.pos, g.py[msg.pos]);
+        g.pl[msg.pl].hide = false;
+        g.pl[msg.pl].img.scale.x = 1;
+        g.pl[msg.pl].img.scale.y = 1;
         break;
     case 'adduser':
         var g = game.state.states.Game;
@@ -191,6 +216,19 @@ Client.prototype.onMessage = function(message) {
         if (g.pl[plnum].dead)
             alert('You are dead.');
         break;
+    case 'hide':
+        var g = game.state.states.Game;
+        g.pl[msg.pl].hide = true;
+        g.pl[msg.pl].img.scale.x = 0.6;
+        g.pl[msg.pl].img.scale.y = 0.6;
+        break;
+    case 'attack':
+        var g = game.state.states.Game;
+        g.pl[msg.pl].hide = false;
+        g.pl[msg.pl].img.scale.x = 2;
+        g.pl[msg.pl].img.scale.y = 2;
+        break;
+ 
     }
 };
 

@@ -27,6 +27,25 @@ wss.on('connection', function(ws) {
                 }));
             }
             break;
+        case 'hide': 
+            for (var i in wss.clients) {
+                wss.clients[i].send(JSON.stringify({
+                    type: 'hide',
+                    pl: msg.pl,
+                }));
+            }
+            break;
+        case 'attack': 
+            for (var i in wss.clients) {
+                wss.clients[i].send(JSON.stringify({
+                    type: 'attack',
+                    pl: msg.pl,
+                }));
+            }
+            break;
+
+
+
         default:
             for (var i in wss.clients) {
                 if (ws != wss.clients[i]) {
@@ -51,3 +70,4 @@ wss.on('connection', function(ws) {
         }        
     });
 });
+
