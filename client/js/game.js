@@ -54,8 +54,10 @@ PhaserGame.prototype = {
     //                    && this.pl[i].x < this.pl[plnum].x + 32
     //                    && this.pl[i].y > this.pl[plnum].y - 32
     //                    && this.pl[i].y < this.pl[plnum].y + 32
-                        && Math.sqrt(Math.pow((this.pl[i].x-this.pl[plnum].x),2)
-                         + Math.pow((this.pl[i].y-this.pl[plnum].y),2))<28) {
+                        && ((Math.sqrt(Math.pow((this.pl[i].x-this.pl[plnum].x),2)
+                         + Math.pow((this.pl[i].y-this.pl[plnum].y),2))<42&&this.pl[i].attack==false)
+                        || (Math.sqrt(Math.pow((this.pl[i].x-this.pl[plnum].x),2)
+                         + Math.pow((this.pl[i].y-this.pl[plnum].y),2))<56&&this.pl[i].attack==true))) {
                         this.client.ws.send(JSON.stringify({action: 'kill', pl: i}));
                     }
                 }
@@ -188,6 +190,7 @@ var Player = function (x, y) {
     this.y = y;
     this.dead = false;
     this.hide = false;
+    this.attack = false;
 };
 
 Player.prototype = {
@@ -234,6 +237,7 @@ Client.prototype.onMessage = function(message) {
         g.pl[msg.pl].hide = false;
         g.pl[msg.pl].img.scale.x = 1;
         g.pl[msg.pl].img.scale.y = 1;
+        g.pl[msg.pl].attack = false;
         break;
     case 'adduser':
         var g = game.state.states.Game;
@@ -264,6 +268,7 @@ Client.prototype.onMessage = function(message) {
         g.pl[msg.pl].hide = false;
         g.pl[msg.pl].img.scale.x = 2;
         g.pl[msg.pl].img.scale.y = 2;
+        g.pl[msg.pl].attack = true;
         break;
  
     }
