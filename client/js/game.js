@@ -100,12 +100,12 @@ PhaserGame.prototype = {
                     this.client.ws.send(JSON.stringify({action: 'hide', pl: plnum}));
                     this.pl[plnum].hide = true;
                 }
-                else {
+                /*else {
                     this.pl[plnum].img.scale.x = 1;
                     this.pl[plnum].img.scale.y = 1;
                     this.pl[plnum].hide = false;
                     this.client.ws.send(JSON.stringify({action: 'update', pl: plnum, pos: this.pl[plnum].x}));
-                }
+                }*/
      
             }
             sleep(50);
@@ -155,7 +155,7 @@ PhaserGame.prototype = {
             this.pl.push(new Player(0, 0));
         var x = this.rnd.between(0,768);
         this.pl[plnum].move(x, this.py[x]);
-        this.client.ws.send(JSON.stringify({action: 'update', pl: plnum, pos: this.pl[plnum].x}));
+        this.client.ws.send(JSON.stringify({action: 'update2t', pl: plnum, pos: this.pl[plnum].x}));
     },
 
     plot: function () {
@@ -239,10 +239,19 @@ Client.prototype.onMessage = function(message) {
         g.pl[msg.pl].img.scale.y = 1;
         g.pl[msg.pl].attack = false;
         break;
+    case 'update2t':
+        var g = game.state.states.Game;
+        g.pl[msg.pl].move(msg.pos, g.py[msg.pos]);
+        g.pl[msg.pl].hide = false;
+        g.pl[msg.pl].img.scale.x = 1;
+        g.pl[msg.pl].img.scale.y = 1;
+        g.pl[msg.pl].attack = false;
+        this.ws.send(JSON.stringify({action: 'update', pl: plnum, pos: g.pl[plnum].x}));
+        break;
     case 'adduser':
         var g = game.state.states.Game;
         g.pl.push(new Player(0, 0));
-        this.client.ws.send(JSON.stringify({action: 'update', pl: plnum, pos: this.pl[plnum].x}));
+        //this.client.ws.send(JSON.stringify({action: 'update', pl: plnum, pos: this.pl[plnum].x}));
  
         break;
     case 'close':

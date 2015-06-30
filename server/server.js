@@ -43,6 +43,17 @@ wss.on('connection', function(ws) {
                 }));
             }
             break;
+        case 'update2t':
+            for (var i in wss.clients) {
+                if (ws != wss.clients[i]) {
+                    wss.clients[i].send(JSON.stringify({
+                        type: 'update2t',
+                        pl: n,
+                        pos: msg.pos
+                    }));
+                }
+            }
+            break;
 
 
 
