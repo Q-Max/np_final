@@ -59,6 +59,7 @@ PhaserGame.prototype = {
                         || (Math.sqrt(Math.pow((this.pl[i].x-this.pl[plnum].x),2)
                          + Math.pow((this.pl[i].y-this.pl[plnum].y),2))<56&&this.pl[i].attack==true))) {
                         this.client.ws.send(JSON.stringify({action: 'kill', pl: i}));
+                        this.pl[i].dead = true;
                     }
                 }
             }
@@ -100,12 +101,13 @@ PhaserGame.prototype = {
                     this.client.ws.send(JSON.stringify({action: 'hide', pl: plnum}));
                     this.pl[plnum].hide = true;
                 }
-                /*else {
+                else {
                     this.pl[plnum].img.scale.x = 1;
                     this.pl[plnum].img.scale.y = 1;
                     this.pl[plnum].hide = false;
                     this.client.ws.send(JSON.stringify({action: 'update', pl: plnum, pos: this.pl[plnum].x}));
-                }*/
+                    sleep(450);
+                }
      
             }
             sleep(50);
