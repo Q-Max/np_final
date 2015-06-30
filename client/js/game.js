@@ -60,6 +60,7 @@ PhaserGame.prototype = {
                          + Math.pow((this.pl[i].y-this.pl[plnum].y),2))<56&&this.pl[i].attack==true))) {
                         this.client.ws.send(JSON.stringify({action: 'kill', pl: i}));
                         this.pl[i].dead = true;
+                        this.pl[i].move(-100,-100);
                     }
                 }
             }
@@ -110,7 +111,7 @@ PhaserGame.prototype = {
                 }
      
             }
-            sleep(50);
+//            sleep(50);
         }
     
         //if (this.cursor.up.isDown) {
@@ -213,7 +214,7 @@ function Client() {
 }
 
 Client.prototype.openConnection = function() {
-    this.ws = new WebSocket("ws://192.168.20.11:4000");
+    this.ws = new WebSocket("ws://192.168.20.22:4000");
     this.connected = false;
     this.ws.onmessage = this.onMessage.bind(this);
     this.ws.onerror = this.displayError.bind(this);
@@ -264,9 +265,9 @@ Client.prototype.onMessage = function(message) {
     case 'kill':
         var g = game.state.states.Game;
         g.pl[msg.pl].move(-100, -100);
-        g.pl[msg.pl].dead = true;
-        if (g.pl[plnum].dead)
+        if (plnum==msg.pl && !g.pl[plnum].dead)
             alert('You are dead.');
+        g.pl[msg.pl].dead = true;
         break;
     case 'hide':
         var g = game.state.states.Game;
