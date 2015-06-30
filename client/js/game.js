@@ -55,7 +55,7 @@ PhaserGame.prototype = {
     //                    && this.pl[i].y > this.pl[plnum].y - 32
     //                    && this.pl[i].y < this.pl[plnum].y + 32
                         && Math.sqrt(Math.pow((this.pl[i].x-this.pl[plnum].x),2)
-                         + Math.pow((this.pl[i].y-this.pl[plnum].y),2))<32) {
+                         + Math.pow((this.pl[i].y-this.pl[plnum].y),2))<28) {
                         this.client.ws.send(JSON.stringify({action: 'kill', pl: i}));
                     }
                 }
